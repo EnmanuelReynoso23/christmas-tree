@@ -50,11 +50,12 @@ class ErrorBoundary extends React.Component<EBProps, EBState> {
 
 export default function App() {
   const [mode, setMode] = useState<TreeMode>(TreeMode.FORMED);
-  const [handPosition, setHandPosition] = useState<{
-    x: number;
-    y: number;
-    detected: boolean;
-  }>({ x: 0.5, y: 0.5, detected: false });
+  const [handPosition, setHandPosition] = useState<{ x: number; y: number; z: number; detected: boolean }>({
+    x: 0.5,
+    y: 0.5,
+    z: 0.5, // Default depth
+    detected: false
+  });
   const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([
     '/photos/principal.png',
     '/photos/segunda.png',
@@ -161,8 +162,8 @@ export default function App() {
     );
   };
 
-  const handleHandPosition = (x: number, y: number, detected: boolean) => {
-    setHandPosition({ x, y, detected });
+  const handleHandPosition = (x: number, y: number, z: number, detected: boolean) => {
+    setHandPosition({ x, y, z, detected });
   };
 
   const handleTwoHandsDetected = (detected: boolean) => {

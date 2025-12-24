@@ -12,7 +12,7 @@ import { TreeMode } from '../types';
 
 interface ExperienceProps {
   mode: TreeMode;
-  handPosition: { x: number; y: number; detected: boolean };
+  handPosition: { x: number; y: number; z: number; detected: boolean };
   uploadedPhotos: string[];
   twoHandsDetected: boolean;
   onClosestPhotoChange?: (photoUrl: string | null) => void;
@@ -58,8 +58,13 @@ export const Experience: React.FC<ExperienceProps> = ({ mode, handPosition, uplo
       const newAzimuth = currentAzimuth + azimuthDiff * delta * lerpSpeed;
       const newPolar = currentPolar + (targetPolar - currentPolar) * delta * lerpSpeed;
       
-      // Calculate new camera position in spherical coordinates
-      const radius = controls.getDistance();
+       // Calculate new camera position in spherical coordinates
+       // Map Z (hand depth) to Radius (Zoom)
+       // z=0 (far hand) -> max dist (32)
+       // z=1 (close hand) -> min dist (12) 
+       const targetRadius = 32 - (handPosition.z * 20); 
+       const currentRadius = controls.getDistance();
+       const radius = currentRadius + (targetRadius - currentRadius) * delta * 2; // Smooth zoom
       const targetY = 4; // Tree center height
       
       const x = radius * Math.sin(newPolar) * Math.sin(newAzimuth);

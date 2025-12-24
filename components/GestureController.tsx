@@ -6,7 +6,7 @@ import { TreeMode } from '../types';
 interface GestureControllerProps {
   onModeChange: (mode: TreeMode) => void;
   currentMode: TreeMode;
-  onHandPosition?: (x: number, y: number, detected: boolean) => void;
+  onHandPosition?: (x: number, y: number, z: number, detected: boolean) => void;
   onTwoHandsDetected?: (detected: boolean) => void;
 }
 
@@ -15,7 +15,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [gestureStatus, setGestureStatus] = useState<string>("Inicializando...");
-  const [handPos, setHandPos] = useState<{ x: number; y: number } | null>(null);
+  const [handPos, setHandPos] = useState<{ x: number; y: number; z: number } | null>(null);
   const lastModeRef = useRef<TreeMode>(currentMode);
   // Ref for callback to avoid re-triggering effect
   const onModeChangeRef = useRef(onModeChange);
@@ -173,7 +173,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
             setGestureStatus("No se detectó ninguna mano");
             setHandPos(null); // Clear hand position when no hand detected
             if (onHandPosition) {
-              onHandPosition(0.5, 0.5, false); // No hand detected
+              onHandPosition(0.5, 0.5, 0.5, false); // No hand detected
             }
             if (onTwoHandsDetected) {
               onTwoHandsDetected(false);
@@ -207,11 +207,18 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
       const palmCenterX = (landmarks[0].x + landmarks[5].x + landmarks[9].x + landmarks[13].x + landmarks[17].x) / 5;
       const palmCenterY = (landmarks[0].y + landmarks[5].y + landmarks[9].y + landmarks[13].y + landmarks[17].y) / 5;
       
+      // Calculate hand size (depth proxy)
+      // Distance between wrist (0) and middle finger base (9)
+      const depth = Math.hypot(landmarks[0].x - landmarks[9].x, landmarks[0].y - landmarks[9].y);
+      // Normalize depth: roughly 0.05 (far) to 0.4 (close)
+      // We'll map this generally to 0 (far) to 1 (close) for consumption
+      const normalizedDepth = Math.min(Math.max((depth - 0.05) / 0.35, 0), 1);
+
       // Send hand position for camera control
       // Normalize coordinates: x and y are in [0, 1], center at (0.5, 0.5)
-      setHandPos({ x: palmCenterX, y: palmCenterY });
+      setHandPos({ x: palmCenterX, y: palmCenterY, z: normalizedDepth });
       if (onHandPosition) {
-        onHandPosition(palmCenterX, palmCenterY, true);
+        onHandPosition(palmCenterX, palmCenterY, normalizedDepth, true);
       }
       
       const fingerTips = [8, 12, 16, 20];
