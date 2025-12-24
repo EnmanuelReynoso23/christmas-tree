@@ -258,6 +258,41 @@ export default function App() {
         </button>
       </div>
 
+      {isTransitioning && (
+        <div className="fixed inset-0 z-[300] bg-black flex flex-col items-center justify-center p-6 text-center">
+           <div className="relative mb-12">
+              <div className="text-8xl md:text-9xl animate-bounce">
+                {['🎁', '🎄', '🦌', '🎅', '⭐', '⛄'][loadingStep] || '🎄'}
+              </div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 md:w-48 md:h-48 border-4 border-dashed border-[#D4AF37]/30 rounded-full animate-spin-slow"></div>
+           </div>
+
+           <h2 className="text-2xl md:text-4xl font-serif text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#F5E6BF] to-[#D4AF37] mb-8 h-20 flex items-center justify-center px-4 uppercase tracking-tighter">
+              {
+                [
+                  "Enredando las luces del árbol... (otra vez) 🎄",
+                  "Sobornando a los renos con zanahorias... 🥕",
+                  "Escondiendo los regalos de Gianny... 🎁",
+                  "Poniéndole la estrella al árbol (sin caerme)... ⭐",
+                  "Calentando el chocolate caliente... ☕❄️",
+                  "Buscando al Grinch para que no fastidie... 😈"
+                ][loadingStep] || "¡CASI LISTO!"
+              }
+           </h2>
+
+           <div className="w-64 h-1.5 bg-white/10 rounded-full overflow-hidden border border-white/5 shadow-inner">
+              <div 
+                className="h-full bg-gradient-to-r from-[#D4AF37] to-[#F5E6BF] transition-all duration-500 ease-out shadow-[0_0_15px_#D4AF37]"
+                style={{ width: `${(loadingStep / 5) * 100}%` }}
+              ></div>
+           </div>
+           
+           <p className="mt-8 text-[#D4AF37]/50 font-serif text-xs tracking-[0.5em] uppercase animate-pulse">
+             YA TU SABE! 🇩🇴
+           </p>
+        </div>
+      )}
+
       {/* Splash Screen */}
       {!hasStarted && (
         <div className="fixed inset-0 z-[100] flex flex-col items-center bg-black overflow-y-auto pointer-events-auto">
@@ -304,10 +339,6 @@ export default function App() {
                              onClick={() => {
                                setIsMusicMuted(false);
                                setMusicActivated(true);
-                               const iframe = document.getElementById('global-christmas-music') as HTMLIFrameElement;
-                               if (iframe) {
-                                  iframe.src = iframe.src.replace('mute=1', 'mute=0');
-                               }
                              }}
                              className="px-8 py-4 md:px-10 md:py-5 bg-gradient-to-br from-red-600 via-red-500 to-red-800 text-white rounded-xl font-bold font-serif shadow-[0_0_30px_rgba(220,38,38,0.4)] hover:shadow-[0_0_50px_rgba(220,38,38,0.6)] hover:scale-105 transition-all duration-500 flex items-center gap-4 group pointer-events-auto text-sm md:text-lg border border-red-400/30"
                            >
@@ -360,7 +391,21 @@ export default function App() {
                       {currentStep === instructions.length - 1 && (
                         <button 
                           onClick={() => {
-                            setMode(TreeMode.FORMED); setHasStarted(true);
+                            setIsTransitioning(true);
+                            // Start a funny loading sequence
+                            let step = 0;
+                            const interval = setInterval(() => {
+                              step++;
+                              setLoadingStep(step);
+                              if (step >= 5) {
+                                clearInterval(interval);
+                                setTimeout(() => {
+                                  setMode(TreeMode.FORMED);
+                                  setHasStarted(true);
+                                  setIsTransitioning(false);
+                                }, 1000);
+                              }
+                            }, 1500);
                           }}
                           className="px-10 py-4 bg-gradient-to-r from-[#D4AF37] via-[#F5E6BF] to-[#D4AF37] text-black font-extrabold font-serif hover:scale-105 hover:shadow-[0_0_50px_rgba(212,175,55,0.5)] transition-all animate-pulse text-lg tracking-[0.2em] rounded-md uppercase"
                         >
@@ -426,17 +471,17 @@ export default function App() {
         </div>
       )}
 
-      {/* Gesture Control Module */}
-      <GestureController
-        currentMode={mode}
-        onModeChange={(newMode) => {
-          if (hasStarted) {
+      {/* Gesture Control Module - Only loaded after start to save resources */}
+      {hasStarted && (
+        <GestureController
+          currentMode={mode}
+          onModeChange={(newMode) => {
             setMode(newMode);
-          }
-        }}
-        onHandPosition={handleHandPosition}
-        onTwoHandsDetected={handleTwoHandsDetected}
-      />
+          }}
+          onHandPosition={handleHandPosition}
+          onTwoHandsDetected={handleTwoHandsDetected}
+        />
+      )}
 
       {/* Photo Overlay - Shows when photo is clicked or two hands detected */}
       {closestPhoto && (
