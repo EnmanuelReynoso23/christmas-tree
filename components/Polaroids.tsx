@@ -125,8 +125,7 @@ const PolaroidItem: React.FC<PolaroidItemProps> = ({ data, mode, index, onClick,
         groupRef.current.rotation.z = currentRot.z + wobbleZ;
     }
     
-    // 3. Scale Logic
-    const targetScale = mode === TreeMode.CHAOS ? 6.5 : 1.0;
+    const targetScale = mode === TreeMode.CHAOS ? 5.0 : 1.0;
     groupRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 4);
 });
 

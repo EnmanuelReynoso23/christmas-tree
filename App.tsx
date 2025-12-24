@@ -428,7 +428,7 @@ export default function App() {
       <ErrorBoundary children={
         <Canvas
           dpr={[1, 2]}
-          camera={{ position: [0, 6, 28], fov: 50 }}
+          camera={{ position: [0, 5, 22], fov: 60 }}
           gl={{ antialias: false, stencil: false, alpha: false }}
           shadows
         >

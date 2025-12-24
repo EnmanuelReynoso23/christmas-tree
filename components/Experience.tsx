@@ -79,8 +79,8 @@ export const Experience: React.FC<ExperienceProps> = ({ mode, handPosition, uplo
         enablePan={false} 
         minPolarAngle={Math.PI / 4} 
         maxPolarAngle={Math.PI / 1.8}
-        minDistance={10}
-        maxDistance={30}
+        minDistance={5}
+        maxDistance={45}
         enableDamping
         dampingFactor={0.05}
         enabled={true}
