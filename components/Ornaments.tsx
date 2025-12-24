@@ -109,8 +109,17 @@ export const Ornaments: React.FC<OrnamentsProps> = ({ mode, count }) => {
       if (ref.current) {
         data.forEach((d, i) => {
           ref.current!.setColorAt(i, d.color);
+          
+          // Set initial position based on mode
+          const dest = mode === TreeMode.FORMED ? d.targetPos : d.chaosPos;
+          dummy.position.copy(dest);
+          dummy.scale.setScalar(d.scale);
+          dummy.rotation.copy(d.rotationOffset);
+          dummy.updateMatrix();
+          ref.current!.setMatrixAt(i, dummy.matrix);
         });
         ref.current.instanceColor!.needsUpdate = true;
+        ref.current.instanceMatrix.needsUpdate = true;
       }
     });
   }, [ballsData, giftsData, lightsData]);

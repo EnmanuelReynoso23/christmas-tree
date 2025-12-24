@@ -14,7 +14,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [gestureStatus, setGestureStatus] = useState<string>("Initializing...");
+  const [gestureStatus, setGestureStatus] = useState<string>("Inicializando...");
   const [handPos, setHandPos] = useState<{ x: number; y: number } | null>(null);
   const lastModeRef = useRef<TreeMode>(currentMode);
   
@@ -48,8 +48,8 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
         startWebcam();
       } catch (error) {
         console.error("Error initializing MediaPipe:", error);
-        console.warn("Gesture control is unavailable. The app will still work without it.");
-        setGestureStatus("Gesture control unavailable");
+        console.warn("El control por gestos no está disponible. La aplicación seguirá funcionando sin él.");
+        setGestureStatus("Control por gestos no disponible");
         // Don't block the app if gesture control fails
       }
     };
@@ -65,11 +65,11 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
             videoRef.current.srcObject = stream;
             videoRef.current.addEventListener("loadeddata", predictWebcam);
             setIsLoaded(true);
-            setGestureStatus("Waiting for hand...");
+            setGestureStatus("Esperando mano...");
           }
         } catch (err) {
           console.error("Error accessing webcam:", err);
-          setGestureStatus("Permission Denied");
+          setGestureStatus("Permiso Denegado");
         }
       }
     };
@@ -166,7 +166,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
           const landmarks = result.landmarks[0];
           detectGesture(landmarks);
         } else {
-            setGestureStatus("No hand detected");
+            setGestureStatus("No se detectó ninguna mano");
             setHandPos(null); // Clear hand position when no hand detected
             if (onHandPosition) {
               onHandPosition(0.5, 0.5, false); // No hand detected
@@ -242,7 +242,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
         openFrames.current++;
         closedFrames.current = 0;
         
-        setGestureStatus("Detected: OPEN (Unleash)");
+        setGestureStatus("Detectado: ABIERTA (Desatar)");
 
         if (openFrames.current > CONFIDENCE_THRESHOLD) {
             if (lastModeRef.current !== TreeMode.CHAOS) {
@@ -256,7 +256,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
         closedFrames.current++;
         openFrames.current = 0;
         
-        setGestureStatus("Detected: CLOSED (Restore)");
+        setGestureStatus("Detectado: CERRADA (Restaurar)");
 
         if (closedFrames.current > CONFIDENCE_THRESHOLD) {
             if (lastModeRef.current !== TreeMode.FORMED) {
@@ -266,7 +266,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
         }
       } else {
         // Ambiguous
-        setGestureStatus("Detected: ...");
+        setGestureStatus("Detectado: ...");
         openFrames.current = 0;
         closedFrames.current = 0;
       }

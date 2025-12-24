@@ -87,7 +87,7 @@ export const Foliage: React.FC<FoliageProps> = ({ mode, count }) => {
   const meshRef = useRef<THREE.Points>(null);
   
   // Target progress reference for smooth JS-side dampening logic for the uniform
-  const progressRef = useRef(0);
+  const progressRef = useRef(mode === TreeMode.FORMED ? 1 : 0);
 
   const { chaosPositions, targetPositions, randoms } = useMemo(() => {
     const chaos = new Float32Array(count * 3);
@@ -132,7 +132,7 @@ export const Foliage: React.FC<FoliageProps> = ({ mode, count }) => {
 
   const uniforms = useMemo(() => ({
     uTime: { value: 0 },
-    uProgress: { value: 0 },
+    uProgress: { value: mode === TreeMode.FORMED ? 1 : 0 },
   }), []);
 
   useFrame((state, delta) => {

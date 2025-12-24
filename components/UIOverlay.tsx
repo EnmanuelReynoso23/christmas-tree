@@ -8,9 +8,10 @@ interface UIOverlayProps {
   hasPhotos: boolean;
   uploadedPhotos: string[];
   isSharedView: boolean;
+  hasStarted: boolean;
 }
 
-export const UIOverlay: React.FC<UIOverlayProps> = ({ mode, onToggle, onPhotosUpload, hasPhotos, uploadedPhotos, isSharedView }) => {
+export const UIOverlay: React.FC<UIOverlayProps> = ({ mode, onToggle, onPhotosUpload, hasPhotos, uploadedPhotos, isSharedView, hasStarted }) => {
   const isFormed = mode === TreeMode.FORMED;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSharing, setIsSharing] = useState(false);
@@ -66,18 +67,18 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ mode, onToggle, onPhotosUp
 
   const handleShare = async () => {
     if (!uploadedPhotos || uploadedPhotos.length === 0) {
-      setShareError('请先上传照片');
+      setShareError('Por favor, sube fotos primero');
       return;
     }
 
     setIsSharing(true);
     setShareError('');
     setShareLink('');
-    setUploadProgress('准备上传...');
+    setUploadProgress('Preparando subida...');
 
     try {
       // Step 1: Get presigned upload URLs from server
-      setUploadProgress('获取上传地址...');
+      setUploadProgress('Obteniendo URL de subida...');
       const urlsResponse = await fetch('/api/get-upload-urls', {
         method: 'POST',
         headers: {
@@ -93,7 +94,7 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ mode, onToggle, onPhotosUp
         const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname.includes('127.0.0.1');
         
         if (isLocalDev) {
-          console.log('API not available, using localStorage fallback');
+          console.log('API no disponible, usando respaldo de localStorage');
           try {
             const shareId = Math.random().toString(36).substring(2, 10);
             const shareData = {
@@ -105,24 +106,24 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ mode, onToggle, onPhotosUp
             setShareLink(shareLink);
             return;
           } catch (storageError: any) {
-            setShareError('图片数据太大，请减少照片数量或大小');
+            setShareError('Los datos de la imagen son demasiado grandes, reduce la cantidad o el tamaño de las fotos');
             return;
           }
         } else {
-          throw new Error('API 未配置，请检查部署设置');
+          throw new Error('API no configurada, por favor revisa los ajustes de despliegue');
         }
       }
 
       const urlsData = await urlsResponse.json();
 
       if (!urlsResponse.ok) {
-        throw new Error(urlsData.error || '获取上传地址失败');
+        throw new Error(urlsData.error || 'Error al obtener la URL de subida');
       }
 
       const { shareId, uploadUrls } = urlsData;
 
       // Step 2: Upload images directly to R2 using presigned URLs
-      setUploadProgress(`上传照片中 (0/${uploadedPhotos.length})...`);
+      setUploadProgress(`Subiendo fotos (0/${uploadedPhotos.length})...`);
       
       let uploadedCount = 0;
       const uploadPromises = uploadedPhotos.map(async (photo, index) => {
@@ -138,18 +139,18 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ mode, onToggle, onPhotosUp
         });
 
         if (!uploadResponse.ok) {
-          throw new Error(`上传第 ${index + 1} 张图片失败`);
+          throw new Error(`Error al subir la imagen ${index + 1}`);
         }
 
         uploadedCount++;
-        setUploadProgress(`上传照片中 (${uploadedCount}/${uploadedPhotos.length})...`);
+        setUploadProgress(`Subiendo fotos (${uploadedCount}/${uploadedPhotos.length})...`);
         return publicUrl;
       });
 
       const imageUrls = await Promise.all(uploadPromises);
 
       // Step 3: Complete the upload by storing metadata in KV
-      setUploadProgress('生成分享链接...');
+      setUploadProgress('Generando enlace para compartir...');
       const completeResponse = await fetch('/api/complete-upload', {
         method: 'POST',
         headers: {
@@ -164,7 +165,7 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ mode, onToggle, onPhotosUp
       const completeData = await completeResponse.json();
 
       if (!completeResponse.ok) {
-        throw new Error(completeData.error || '保存分享信息失败');
+        throw new Error(completeData.error || 'Error al guardar la información compartida');
       }
 
       setShareLink(completeData.shareLink);
@@ -176,7 +177,7 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ mode, onToggle, onPhotosUp
       
       if (isLocalDev && (error.message?.includes('Failed to fetch') || error.name === 'TypeError')) {
         try {
-          console.log('Network error, using localStorage fallback');
+          console.log('Error de red, usando respaldo de localStorage');
           const shareId = Math.random().toString(36).substring(2, 10);
           const shareData = {
             images: uploadedPhotos,
@@ -187,12 +188,12 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ mode, onToggle, onPhotosUp
           setShareLink(shareLink);
           return;
         } catch (storageError: any) {
-          setShareError('图片数据太大，请减少照片数量或大小');
+          setShareError('Los datos de la imagen son demasiado grandes, reduce la cantidad o el tamaño de las fotos');
           return;
         }
       }
       
-      setShareError(error.message || '分享失败，请重试');
+      setShareError(error.message || 'Error al compartir, por favor intenta de nuevo');
     } finally {
       setIsSharing(false);
       setUploadProgress('');
@@ -212,17 +213,20 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ mode, onToggle, onPhotosUp
   };
 
   const handleCreateMine = () => {
-    // 清除 URL 参数，刷新页面
+    // Limpiar parámetros URL, refrescar página
     window.location.href = window.location.origin;
   };
 
   return (
     <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-10">
       
+
+
+      
       {/* Header */}
       <header className="absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
-        <h1 className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#F5E6BF] to-[#D4AF37] font-serif drop-shadow-lg tracking-wider text-center">
-          Merry Christmas
+        <h1 className="text-4xl md:text-6xl font-bold text-[#D4AF37] font-serif drop-shadow-[0_0_15px_rgba(212,175,55,0.8)] tracking-widest text-center animate-fade-in uppercase">
+          ¡Feliz Navidad Gianny!
         </h1>
       </header>
 
@@ -246,70 +250,21 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ mode, onToggle, onPhotosUp
             className="group px-6 py-3 border-2 border-[#D4AF37] bg-black/70 backdrop-blur-md overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_#D4AF37] hover:border-[#fff] hover:bg-[#D4AF37]/20"
           >
             <span className="relative z-10 font-serif text-base md:text-lg text-[#D4AF37] tracking-[0.1em] group-hover:text-white transition-colors whitespace-nowrap">
-              制作我的圣诞树
+              Crea tu Árbol de Navidad
             </span>
           </button>
         )}
 
-        {/* Not Shared View: Show upload and share controls */}
-        {!isSharedView && (
-          <>
-            {/* Upload Button - Show when no photos */}
-            {!hasPhotos && (
-              <button
-                onClick={handleUploadClick}
-                className="group px-6 py-3 border-2 border-[#D4AF37] bg-black/70 backdrop-blur-md overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_#D4AF37] hover:border-[#fff] hover:bg-[#D4AF37]/20"
-              >
-                <span className="relative z-10 font-serif text-base md:text-lg text-[#D4AF37] tracking-[0.1em] group-hover:text-white transition-colors whitespace-nowrap">
-                  上传照片
-                </span>
-              </button>
-            )}
-
-            {/* Share Button - Show when photos are uploaded but link not generated */}
-            {hasPhotos && !shareLink && (
-              <div className="flex flex-col items-end gap-2">
-                <button
-                  onClick={handleShare}
-                  disabled={isSharing}
-                  className="group px-6 py-3 border-2 border-[#D4AF37] bg-black/70 backdrop-blur-md overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_#D4AF37] hover:border-[#fff] hover:bg-[#D4AF37]/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <span className="relative z-10 font-serif text-base md:text-lg text-[#D4AF37] tracking-[0.1em] group-hover:text-white transition-colors whitespace-nowrap">
-                    {uploadProgress || (isSharing ? '生成中...' : '生成分享链接')}
-                  </span>
-                </button>
-                {shareError && (
-                  <p className="text-red-400 text-xs font-serif text-right">{shareError}</p>
-                )}
-              </div>
-            )}
-
-            {/* Share Link Display - Show after link is generated */}
-            {shareLink && (
-              <div className="bg-black/80 backdrop-blur-md border-2 border-[#D4AF37] p-4 max-w-sm">
-                <p className="text-[#F5E6BF] font-serif text-sm mb-2">分享链接已生成</p>
-                <div className="flex items-center gap-2 mb-2">
-                  <input
-                    type="text"
-                    value={shareLink}
-                    readOnly
-                    className="flex-1 bg-black/50 text-[#D4AF37] px-3 py-2 text-xs border border-[#D4AF37]/30 font-mono"
-                  />
-                  <button
-                    onClick={handleCopyLink}
-                    className="px-3 py-2 border border-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 transition-colors shrink-0"
-                  >
-                    <span className="text-[#D4AF37] text-xs font-serif whitespace-nowrap">
-                      {copied ? '✓ 已复制' : '复制'}
-                    </span>
-                  </button>
-                </div>
-                <p className="text-[#F5E6BF]/50 text-xs font-serif">
-                  30天后过期
-                </p>
-              </div>
-            )}
-          </>
+        {/* Not Shared View: Show upload controls only */}
+        {!isSharedView && !hasPhotos && (
+          <button
+            onClick={handleUploadClick}
+            className="group px-6 py-3 border-2 border-[#D4AF37] bg-black/70 backdrop-blur-md overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_#D4AF37] hover:border-[#fff] hover:bg-[#D4AF37]/20"
+          >
+            <span className="relative z-10 font-serif text-base md:text-lg text-[#D4AF37] tracking-[0.1em] group-hover:text-white transition-colors whitespace-nowrap">
+              Subir fotos
+            </span>
+          </button>
         )}
       </div>
 
