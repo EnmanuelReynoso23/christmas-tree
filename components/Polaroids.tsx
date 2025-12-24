@@ -125,7 +125,7 @@ const PolaroidItem: React.FC<PolaroidItemProps> = ({ data, mode, index, onClick,
         groupRef.current.rotation.z = currentRot.z + wobbleZ;
     }
     
-    const targetScale = mode === TreeMode.CHAOS ? 5.0 : 1.0;
+    const targetScale = mode === TreeMode.CHAOS ? 5.8 : 1.0;
     groupRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 4);
 });
 
@@ -199,9 +199,9 @@ export const Polaroids: React.FC<PolaroidsProps> = ({ mode, uploadedPhotos, twoH
       );
 
       // 2. Chaos Position - CINEMATIC CAROUSEL (Massive foreground pass)
-      // Orbiting just in front of the camera (Z=20) for best visibility
-      const carouselRadius = 18; // Less than 22 (original) and 28 (previous), strictly visible
-      const carouselY = 8; // Slightly lower than original 9
+      // Orbiting very close to the camera (Z=22) for maximum closeness
+      const carouselRadius = 20; // Increased from 18 to be closer to camera height
+      const carouselY = 8; 
       const angle = (i / count) * Math.PI * 2;
       const chaosPos = new THREE.Vector3(
         carouselRadius * Math.sin(angle),
