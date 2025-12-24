@@ -471,17 +471,17 @@ export default function App() {
         </div>
       )}
 
-      {/* Gesture Control Module - Only loaded after start to save resources */}
-      {hasStarted && (
-        <GestureController
-          currentMode={mode}
-          onModeChange={(newMode) => {
+      {/* Gesture Control Module */}
+      <GestureController
+        currentMode={mode}
+        onModeChange={(newMode) => {
+          if (hasStarted) {
             setMode(newMode);
-          }}
-          onHandPosition={handleHandPosition}
-          onTwoHandsDetected={handleTwoHandsDetected}
-        />
-      )}
+          }
+        }}
+        onHandPosition={handleHandPosition}
+        onTwoHandsDetected={handleTwoHandsDetected}
+      />
 
       {/* Photo Overlay - Shows when photo is clicked or two hands detected */}
       {closestPhoto && (

@@ -21,6 +21,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
   // Debounce logic refs
   const openFrames = useRef(0);
   const closedFrames = useRef(0);
+  const lastPredictionTime = useRef(0);
   const CONFIDENCE_THRESHOLD = 5; // Number of consecutive frames to confirm gesture
 
   useEffect(() => {
@@ -149,6 +150,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
       if (!handLandmarker || !videoRef.current) return;
 
       const startTimeMs = performance.now();
+
       if (videoRef.current.videoWidth > 0) { // Ensure video is ready
         const result = handLandmarker.detectForVideo(videoRef.current, startTimeMs);
 
