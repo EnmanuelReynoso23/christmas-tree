@@ -17,6 +17,8 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
   const [gestureStatus, setGestureStatus] = useState<string>("Inicializando...");
   const [handPos, setHandPos] = useState<{ x: number; y: number } | null>(null);
   const lastModeRef = useRef<TreeMode>(currentMode);
+  // Ref for callback to avoid re-triggering effect
+  const onModeChangeRef = useRef(onModeChange);
   
   // Debounce logic refs
   const openFrames = useRef(0);
@@ -249,7 +251,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
         if (openFrames.current > CONFIDENCE_THRESHOLD) {
             if (lastModeRef.current !== TreeMode.CHAOS) {
                 lastModeRef.current = TreeMode.CHAOS;
-                onModeChange(TreeMode.CHAOS);
+                onModeChangeRef.current(TreeMode.CHAOS);
             }
         }
 
@@ -263,7 +265,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
         if (closedFrames.current > CONFIDENCE_THRESHOLD) {
             if (lastModeRef.current !== TreeMode.FORMED) {
                 lastModeRef.current = TreeMode.FORMED;
-                onModeChange(TreeMode.FORMED);
+                onModeChangeRef.current(TreeMode.FORMED);
             }
         }
       } else {
@@ -280,6 +282,11 @@ export const GestureController: React.FC<GestureControllerProps> = ({ onModeChan
       cancelAnimationFrame(animationFrameId);
       if (handLandmarker) handLandmarker.close();
     };
+  }, []); // Empty dependency array - initialization only happens once!
+
+  // Update refs when props change
+  useEffect(() => {
+    onModeChangeRef.current = onModeChange;
   }, [onModeChange]);
 
   // Sync ref with prop updates to prevent overriding in closure

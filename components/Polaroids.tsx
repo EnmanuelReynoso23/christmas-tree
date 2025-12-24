@@ -200,9 +200,9 @@ export const Polaroids: React.FC<PolaroidsProps> = ({ mode, uploadedPhotos, twoH
       );
 
       // 2. Chaos Position - CINEMATIC CAROUSEL (Massive foreground pass)
-      // Orbiting between the camera (Z=20) and the tree center (Z=0)
-      const carouselRadius = 22; 
-      const carouselY = 9;
+      // Orbiting closer to the camera and at eye level
+      const carouselRadius = 15; // Reduced from 22 to keep in view
+      const carouselY = 5; // Reduced from 9 to be at eye level
       const angle = (i / count) * Math.PI * 2;
       const chaosPos = new THREE.Vector3(
         carouselRadius * Math.sin(angle),
