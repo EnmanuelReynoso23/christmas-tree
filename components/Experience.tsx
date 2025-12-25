@@ -59,33 +59,29 @@ export const Experience: React.FC<ExperienceProps> = ({ mode, handPosition, uplo
       const newPolar = currentPolar + (targetPolar - currentPolar) * delta * lerpSpeed;
       
        // Calculate new camera position in spherical coordinates
-       // Map Z (hand depth) to Radius (Zoom)
-       // z=0 (far hand) -> max dist (32)
-       // z=1 (close hand) -> min dist (12) 
-       const targetRadius = 32 - (handPosition.z * 20); 
-       const currentRadius = controls.getDistance();
-       const radius = currentRadius + (targetRadius - currentRadius) * delta * 2; // Smooth zoom
-      const targetY = 4; // Tree center height
-      
-      const x = radius * Math.sin(newPolar) * Math.sin(newAzimuth);
-      const y = targetY + radius * Math.cos(newPolar);
-      const z = radius * Math.sin(newPolar) * Math.cos(newAzimuth);
-      
-      // Update camera position and target
-      controls.object.position.set(x, y, z);
-      controls.target.set(0, targetY, 0);
-      controls.update();
-    }
-  });
-  return (
-    <>
-      <OrbitControls 
-        ref={controlsRef}
-        enablePan={false} 
-        minPolarAngle={Math.PI / 4} 
-        maxPolarAngle={Math.PI / 1.8}
-        minDistance={5}
-        maxDistance={45}
+       const radius = 24; // Fixed radius for consistent view
+       const targetY = 5; // Updated to match polaroid height
+       
+       const x = radius * Math.sin(newPolar) * Math.sin(newAzimuth);
+       const y = targetY + radius * Math.cos(newPolar);
+       const z = radius * Math.sin(newPolar) * Math.cos(newAzimuth);
+       
+       // Update camera position and target
+       controls.object.position.set(x, y, z);
+       controls.target.set(0, targetY, 0);
+       controls.update();
+     }
+   });
+   return (
+     <>
+       <OrbitControls 
+         ref={controlsRef}
+         enablePan={false}
+         enableZoom={false} // Disable user zoom as requested
+         minPolarAngle={Math.PI / 4} 
+         maxPolarAngle={Math.PI / 1.8}
+         minDistance={24}
+         maxDistance={24}
         enableDamping
         dampingFactor={0.05}
         enabled={true}
