@@ -59,8 +59,8 @@ export const Experience: React.FC<ExperienceProps> = ({ mode, handPosition, uplo
       const newPolar = currentPolar + (targetPolar - currentPolar) * delta * lerpSpeed;
       
        // Calculate new camera position in spherical coordinates
-       const radius = 24; // Fixed radius for consistent view
-       const targetY = 5; // Updated to match polaroid height
+       const radius = 18; // Fixed radius closer to center (more inside)
+       const targetY = 5; 
        
        const x = radius * Math.sin(newPolar) * Math.sin(newAzimuth);
        const y = targetY + radius * Math.cos(newPolar);
@@ -77,11 +77,11 @@ export const Experience: React.FC<ExperienceProps> = ({ mode, handPosition, uplo
        <OrbitControls 
          ref={controlsRef}
          enablePan={false}
-         enableZoom={false} // Disable user zoom as requested
+         enableZoom={false}
          minPolarAngle={Math.PI / 4} 
          maxPolarAngle={Math.PI / 1.8}
-         minDistance={24}
-         maxDistance={24}
+         minDistance={18}
+         maxDistance={18}
         enableDamping
         dampingFactor={0.05}
         enabled={true}
