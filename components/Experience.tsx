@@ -59,7 +59,7 @@ export const Experience: React.FC<ExperienceProps> = ({ mode, handPosition, uplo
       const newPolar = currentPolar + (targetPolar - currentPolar) * delta * lerpSpeed;
       
        // Calculate new camera position in spherical coordinates
-       const radius = 18; // Fixed radius closer to center (more inside)
+       const radius = 18; // [EDITAR AQUI] Radio de la cámara: Pon un número más grande para alejarte (ej. 24), más pequeño para acercarte (ej. 14).
        const targetY = 5; 
        
        const x = radius * Math.sin(newPolar) * Math.sin(newAzimuth);
@@ -80,8 +80,8 @@ export const Experience: React.FC<ExperienceProps> = ({ mode, handPosition, uplo
          enableZoom={false}
          minPolarAngle={Math.PI / 4} 
          maxPolarAngle={Math.PI / 1.8}
-         minDistance={18}
-         maxDistance={18}
+         minDistance={18} // [EDITAR AQUI] Distancia Mínima: Debe ser igual al radio de arriba para bloquear el zoom.
+         maxDistance={18} // [EDITAR AQUI] Distancia Máxima: Debe ser igual al radio de arriba para bloquear el zoom.
         enableDamping
         dampingFactor={0.05}
         enabled={true}
