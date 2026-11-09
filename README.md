@@ -1,8 +1,8 @@
-# 🎄 Árbol de Navidad Interactivo de Lujo
+# Árbol de Navidad Interactivo de Lujo
 
 Una experiencia inmersiva de árbol de Navidad en 3D de alta fidelidad con control de gestos manuales, ensamblaje dinámico de caos a orden y una estética lujosa en verde esmeralda y oro.
 
-## 📝 Prompt Original
+## Prompt Original
 
 Gemini 3 en Google AI Studio y Claude 4.5 Sonnet en Cursor:
 
@@ -15,7 +15,7 @@ Añadir muchas decoraciones de fotos estilo polaroid.
 Usar la imagen de la cámara para detectar gestos: la mano abierta representa "unleash" (desatar), cerrar el puño vuelve al árbol de Navidad. El movimiento de la mano permite ajustar el ángulo de visión.
 ```
 
-## 🛠️ Instalación
+## Instalación
 
 1. **Clonar el repositorio:**
 
@@ -36,7 +36,7 @@ Usar la imagen de la cámara para detectar gestos: la mano abierta representa "u
    npm run dev
    ```
 
-   > 📝 Nota: El modo de desarrollo local utiliza localStorage para compartir (solo funciona en el mismo navegador).
+   > Nota: El modo de desarrollo local utiliza localStorage para compartir (solo funciona en el mismo navegador).
    > Para compartir en la nube completamente, consulta el paso 4.
 
 4. **Configurar Cloudflare (Opcional - para compartir en la nube):**
@@ -50,7 +50,7 @@ Usar la imagen de la cámara para detectar gestos: la mano abierta representa "u
    - Permite el acceso a la cámara para el control de gestos.
    - Haz clic en "Subir fotos" para cargar tus imágenes.
 
-## 🎯 Uso
+## Uso
 
 ### Carga de fotos y compartir
 
@@ -88,7 +88,7 @@ Cuando no se detecta ninguna mano, puedes:
 - **Desplazarte (scroll)** para acercar/alejar el zoom.
 - **Clic derecho y arrastrar** para desplazarte lateralmente (desactivado por defecto).
 
-## 🏗️ Stack Tecnológico
+## Stack Tecnológico
 
 ### Frontend
 
@@ -116,6 +116,6 @@ Cuando no se detecta ninguna mano, puedes:
 - Renderizado instanciado para mejorar el rendimiento
 - Efectos de Bloom y postprocesamiento
 
-## 🎅 ¡Felices Fiestas!
+## ¡Felices Fiestas!
 
-¡Que tu código sea alegre y brillante! 🎄✨
+¡Que tu código sea alegre y brillante! 
